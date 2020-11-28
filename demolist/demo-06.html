@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <script src="../build/react.development.js"></script>
+    <script src="../build/react-dom.development.js"></script>
+    <script src="../build/babel.min.js"></script>
+    <!-- 注意导入proptypes脚本 -->
+    <script src="../build/prop-types.js"></script>
+</head>
+
+<body>
+    <div id="example"></div>
+    <script type="text/babel">
+
+        //var data = 123;   
+        //页面有输出，控制台报错，title类型匹配问题
+
+        var data = "123";
+
+        class MyTitle extends React.Component {
+            //propTypes用来规范props必须满足的类型
+            //大小写使用注意
+            static propTypes = {
+                // 字符串格式，且必要。
+                title: PropTypes.string.isRequired,
+            }
+            render() {
+                return <h1> {this.props.title} </h1>;
+            }
+        }
+
+        ReactDOM.render(
+            <MyTitle title={data} />,
+            document.getElementById('example')
+        );
+
+
+    </script>
+</body>
+
+</html>

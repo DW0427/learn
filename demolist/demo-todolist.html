@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <script src="../build/react.development.js"></script>
+    <script src="../build/react-dom.development.js"></script>
+    <script src="../build/babel.min.js"></script>
+    <link rel="stylesheet" href="todolist.css">
+    <style>
+        .container {
+            width: 400px;
+            margin: 0 auto;
+            text-align: center;
+            border: 3px solid black;
+            border-radius: 5px;
+        }
+
+        li {
+            list-style-type: none;
+        }
+
+        .todoitem {
+            padding-left: -10px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+            margin: 4px;
+        }
+
+        .todoitem .delete {
+            float: right;
+            font-size: 12px;
+            padding-right: 30px;
+        }
+
+        .dialog h3 {
+            margin-bottom: 0;
+        }
+
+        .dialog .addtask {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="example"></div>
+    <script type="text/babel">
+        //父组件TodoList
+        class TodoList extends React.Component {
+            constructor(props) {
+                super(props);
+
+                this.state = {
+                    list: [{
+                        id: 0,
+                        task: 'Eat',
+                        status: 0
+                    }, {
+                        id: 1,
+                        task: 'Sleep',
+                        status: 0
+                    }, {
+                        id: 2,
+                        task: 'Play',
+                        status: 0
+                    }],
+                    finishied: 0
+                };
+            }
+
+            addTask(newitem) {
+                var allTask = this.state.list;
+                allTask.push(newitem);
+                this.setState({
+                    list: allTask
+                });
+            }
+
+            updateFinished(todoItem) {
+                var fin = 0;
+                this.state.list.forEach((item) => {
+                    if (item.id === todoItem.id) {
+                        item.status = todoItem.status;
+                    }
+                    if (item.status === 1) {
+                        fin++;
+                    }
+                });
+                this.setState({
+                    finishied: fin
+                });
+            }
+
+            updateDelete(todoItem) {
+                var obj = [], fin = 0;
+                this.state.list.forEach((item) => {
+                    if (item.id !== todoItem.id) {
+                        obj.push(item);
+                        if (item.status === 1) {
+                            fin++;
+                        }
+                    }
+                });
+                this.setState({
+                    list: obj,
+                    finishied: fin
+                });
+            }
+
+            render() {
+                return (
+                    <div class="container">
+                        <h1>Todo List</h1>
+                        <ul>
+                            {this.state.list.map((item, index) =>
+                                <ListItem
+                                    item={item}
+                                    finishedChange={this.updateFinished.bind(this)}
+                                    deleteChange={this.updateDelete.bind(this)}
+                                    key={index}
+                                />
+                            )}
+                        </ul>
+                        <li>
+                            <strong>{this.state.finishied}</strong> Finished / <strong>{this.state.list.length}</strong> Total
+                        </li>
+                        <Dialog addNewTask={this.addTask.bind(this)} nums={this.state.list.length} />
+                    </div>
+                )
+            }
+        }
+
+        //子组件ListItem
+        class ListItem extends React.Component {
+            constructor(props) {
+                super(props);
+
+                this.handleFinished = this.handleFinished.bind(this);
+                this.handleDelete = this.handleDelete.bind(this);
+            }
+
+            handleFinished() {
+                var status = this.props.item.status;
+                status = (status === 0 ? 1 : 0);
+
+                var obj = {
+                    id: this.props.item.id,
+                    task: this.props.item.task,
+                    status: status
+                }
+
+                this.props.finishedChange(obj);
+            }
+
+            handleDelete() {
+                this.props.deleteChange(this.props.item);
+            }
+
+            render() {
+                const item = this.props.item;
+
+                const finish = {
+                    color: '#ccc',
+                    textDecoration: 'line-through',
+                };
+
+                const unfinish = {
+                    color: 'black'
+                };
+                var itemStyle = (item.status === 0 ? unfinish : finish);
+
+                return (
+                    <li key={item.id} style={itemStyle} className="todoitem">
+                        <input
+                            type="checkbox"
+                            onClick={this.handleFinished}
+                            id={item.id}
+
+                        />
+                        <span className='taskshow'>{item.task}</span>
+                        <span onClick={this.handleDelete} className='delete'>Delete</span>
+                    </li>
+                );
+            }
+
+        }
+
+        //子组件Dialog
+        class Dialog extends React.Component {
+            constructor(props) {
+                super(props);
+
+                this.handleClick = this.handleClick.bind(this);
+            }
+
+            handleClick() {
+                var len = this.props.nums;
+                var newId = (len > 0 ? len : 0);
+                var value = this.refs.myInput.value;
+                if (value != '') {
+                    var obj = {
+                        id: newId,
+                        task: value,
+                        status: 0
+                    };
+                    this.refs.myInput.value = '';
+                    this.props.addNewTask(obj);
+                }
+            }
+
+            render() {
+                return (
+                    <div className="dialog">
+                        <h3>Add Task</h3>
+                        <div className="addtask">
+                            <input type="text" ref="myInput" placeholder="Try to add tasks!" />
+                            <input type="button" value="Add" onClick={this.handleClick} />
+                        </div>
+                    </div>
+                );
+            }
+        }
+
+
+        ReactDOM.render(
+            <TodoList />,
+            document.getElementById('example')
+        );
+    </script>
+</body>
+
+</html>

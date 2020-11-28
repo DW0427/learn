@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <script src="../build/react.development.js"></script>
+    <script src="../build/react-dom.development.js"></script>
+    <script src="../build/babel.min.js"></script>
+</head>
+
+<body>
+    <div id="example"></div>
+    <script type="text/babel">
+
+        class LikeButton extends React.Component {
+            constructor(props) {
+                super(props)
+                //state对象,新增liked属性，默认值为false
+                this.state = { liked: false }
+                this.handleClick = this.handleClick.bind(this)
+            }
+            handleClick(event) {
+                //反转liked属性值
+                this.setState({ liked: !this.state.liked });
+            }
+            render() {
+                var text = this.state.liked ? 'liked' : 'haven\'t liked';
+                return (
+                    <p onClick={this.handleClick}>
+                        You {text} this. Click to toggle.
+                    </p>
+                )
+            }
+        }
+
+        ReactDOM.render(
+            <LikeButton />,
+            document.getElementById('example')
+        );
+    </script>
+</body>
+
+</html>
